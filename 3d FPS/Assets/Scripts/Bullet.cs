@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
@@ -22,13 +23,13 @@ public class Bullet : MonoBehaviour
 
         //Destroy bullet over time
         lifeTime -= Time.deltaTime;
-        if(lifeTime <=0)
+        if(lifeTime <= 0)
         {
             Destroy(this.gameObject);
         }
     }
 
-    void OnTriggerEnter(Collider other)
+    void OnCollisionEnter(Collision other)
     {
         Destroy(this.gameObject);
     }

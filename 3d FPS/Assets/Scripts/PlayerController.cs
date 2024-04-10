@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Common;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -14,42 +12,45 @@ public class PlayerController : MonoBehaviour
     public Transform firePoint;
     public Transform theCamera;
     public Transform groundCheckpoint;
-    public LayerMask whatisGround; 
+    public LayerMask whatIsGround;
     private bool _canPlayerJump;
     private Vector3 _moveInput;
     private CharacterController _characterController;
+    private Ammo _ammo;
 
     // Start is called before the first frame update
     void Start()
     {
         _characterController = GetComponent<CharacterController>();
+        _ammo = GetComponent<Ammo>();
     }
 
     // Update is called once per frame
     void Update()
     {
         //Store the y velocity
-        float yVelocity = _moveInput.y;
+        float yVeclocity = _moveInput.y;
 
-        //Player movement 
-        //_moveInput.x = Input.GetAxisRaw("Horizontal") * moveSpeed * Time.deltaTime;
-        //_moveInput.z = Input.GetAxis("Vertical") * moveSpeed *Time.deltaTime;
+        //Player movement
+        //_moveInput.x = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
+        //_moveInput.z = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
         Vector3 forwardDirection = transform.forward * Input.GetAxis("Vertical");
         Vector3 horizontalDirection = transform.right * Input.GetAxis("Horizontal");
 
         _moveInput =(forwardDirection + horizontalDirection).normalized;
         _moveInput *= moveSpeed;
 
-        //Player Jumping
-        _moveInput.y = yVelocity;
+        //Player jumping setup
+        _moveInput.y = yVeclocity;
         _moveInput.y += Physics.gravity.y * gravityModifier * Time.deltaTime;
 
         if(_characterController.isGrounded)
         {
             _moveInput.y = Physics.gravity.y * gravityModifier * Time.deltaTime;
         }
+
         //Checking to see if player can jump
-        _canPlayerJump = Physics.OverlapSphere(groundCheckpoint.position, 0.50f, whatisGround).Length > 0;
+        _canPlayerJump = Physics.OverlapSphere(groundCheckpoint.position, 0.50f, whatIsGround).Length > 0;
 
         //Apply a jump force to player
         if(Input.GetKeyDown(KeyCode.Space) && _canPlayerJump)
@@ -59,17 +60,17 @@ public class PlayerController : MonoBehaviour
 
         _characterController.Move(_moveInput * Time.deltaTime);
 
-        // Control camera rotation
-        Vector2  mouseInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * mouseSensitivity;
+        //Control camera rotation
+        Vector2 mouseInput = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y")) * mouseSensitivity;
 
-        //Player rotation
+        //Player Rotation
         transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y + mouseInput.x, transform.rotation.eulerAngles.z);
 
-        //Camera rotation
+        //Camera Rotation
         theCamera.rotation = Quaternion.Euler(theCamera.rotation.eulerAngles + new Vector3(-mouseInput.y, 0f, 0f));
 
         //Handle Shooting
-        if(Input.GetMouseButton(0))
+        if(Input.GetMouseButtonDown(0) && _ammo.GetAmmoAmount() > 0)
         {
             RaycastHit hit;
 
@@ -79,14 +80,23 @@ public class PlayerController : MonoBehaviour
                 {
                     firePoint.LookAt(hit.point);
                 }
-                else
-                {
-                    firePoint.LookAt(theCamera.position + (theCamera.forward * 30f));
-                }
-
-                Instantiate(bullet, transform.position, transform.rotation);
             }
+            else
+            {
+                firePoint.LookAt(theCamera.position + (theCamera.forward * 30f));
+            }
+                
+            Instantiate(bullet, firePoint.position, firePoint.rotation);
+            _ammo.RemoveAmmo();
         }
-    
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.CompareTag("Ammo Box"))
+        {
+            _ammo.AddAmmo();
+            other.gameObject.SetActive(false);
+        }
     }
 }

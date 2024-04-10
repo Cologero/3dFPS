@@ -1,18 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using TMPro;
 using UnityEngine;
+using TMPro;
 
-public class Time : MonoBehaviour
+public class Timer : MonoBehaviour
 {
     public float timeRemaining = 60f;
     public TextMeshProUGUI timerText;
     private bool _isTimerRunning = false;
+
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        //StartGameTimer();
     }
 
     // Update is called once per frame
@@ -29,6 +30,7 @@ public class Time : MonoBehaviour
             {
                 timeRemaining = 0;
                 _isTimerRunning = false;
+                GameObject.Find("Game Manager").GetComponent<CrossFade>().FadeIn();
             }
         }
     }
@@ -38,16 +40,18 @@ public class Time : MonoBehaviour
         _isTimerRunning = true;
     }
 
-    private void EndGameTimer()
+    public void EndGameTimer()
     {
         _isTimerRunning = false;
     }
 
     private void DisplayGameTimer(float timeToDisplay)
     {
-        timeRemaining += 1;
+        timeToDisplay += 1;
 
         float minutes = Mathf.FloorToInt(timeToDisplay / 60);
         float seconds = Mathf.FloorToInt(timeToDisplay % 60);
+
+        timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 }

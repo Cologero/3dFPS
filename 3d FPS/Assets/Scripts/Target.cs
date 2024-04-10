@@ -4,15 +4,28 @@ using UnityEngine;
 
 public class Target : MonoBehaviour
 {
-    // Start is called before the first frame update
     void Start()
     {
-        
+        this.gameObject.SetActive(true);
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnCollisionEnter(Collision other)
     {
-        
+        if(other.gameObject.CompareTag("Bullet"))
+        {
+            //add points to the score
+            if(this.gameObject.tag == "Floating Target")
+            {
+                //Destroy(this.gameObject);
+                GameObject.Find("Game Manager").GetComponent<GameManager>().UpdateTargetAmount(-1);
+                this.gameObject.SetActive(false);
+            }
+            //add grayscale to standing target later on
+            if(this.gameObject.tag == "Target")
+            {
+                GameObject.Find("Game Manager").GetComponent<GameManager>().UpdateTargetAmount(-1);
+                this.gameObject.SetActive(false);
+            }
+        }
     }
 }

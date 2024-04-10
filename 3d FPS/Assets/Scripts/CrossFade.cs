@@ -11,7 +11,7 @@ public class CrossFade : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        FadeOut();
     }
 
     // Update is called once per frame
@@ -22,12 +22,13 @@ public class CrossFade : MonoBehaviour
             if(canvasGroup.alpha < 1)
             {
                 canvasGroup.alpha += Time.deltaTime;
-                if(canvasGroup.alpha >=1)
+                if(canvasGroup.alpha >= 1)
                 {
                     _fadeIn = false;
                 }
             }
         }
+
         if(_fadeOut)
         {
             if(canvasGroup.alpha >= 0)
@@ -36,12 +37,13 @@ public class CrossFade : MonoBehaviour
                 if(canvasGroup.alpha == 0)
                 {
                     _fadeOut = false;
+                    GameObject.Find("Game Manager").GetComponent<Timer>().StartGameTimer();
                 }
             }
         }
     } // end Update
 
-    public void FadeIn ()
+    public void FadeIn()
     {
         _fadeIn = true;
     }
