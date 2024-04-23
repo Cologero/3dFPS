@@ -29,7 +29,7 @@ public class Ammo : MonoBehaviour
     public void RemoveAmmo()
     {
         _ammoAmount -= 1;
-        ammoText.text = "Ammo: " + _ammoAmount.ToString();
+        ammoText.text = "Ammo:" + _ammoAmount.ToString();
     }
 
     public void AddAmmo()
